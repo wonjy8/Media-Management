@@ -3,6 +3,8 @@ import type { MouseEvent } from 'react'
 
 export const routes = {
   equipment: { path: 'equipment/', area: 'user', tab: 'equipment' },
+  cart: { path: 'cart/', area: 'user', tab: 'cart' },
+  checkout: { path: 'checkout/', area: 'user', tab: 'checkout' },
   returns: { path: 'returns/', area: 'user', tab: 'returns' },
   'admin-equipment': { path: 'admin/equipment/', area: 'admin', tab: 'equipment' },
   'admin-groups': { path: 'admin/groups/', area: 'admin', tab: 'groups' },
@@ -41,15 +43,18 @@ export function useAppRoute() {
     }
     return () => window.removeEventListener('popstate', sync)
   }, [])
-  function follow(event: MouseEvent<HTMLAnchorElement>, key: RouteKey) {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-    event.preventDefault()
+  function navigate(key: RouteKey) {
     const href = routeHref(key)
     if (window.location.pathname + window.location.search !== href) window.history.pushState({}, '', href)
     setLocation(snapshot())
     window.scrollTo(0, 0)
   }
+  function follow(event: MouseEvent<HTMLAnchorElement>, key: RouteKey) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    navigate(key)
+  }
   const key = resolve()
   const route = key === 'not-found' ? null : routes[key]
-  return { key, route, follow }
+  return { key, route, follow, navigate }
 }

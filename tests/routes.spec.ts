@@ -3,7 +3,7 @@ import {readFileSync,existsSync} from 'node:fs'
 test.use({launchOptions:{executablePath:'/usr/bin/chromium',args:['--no-sandbox']}})
 const base='http://localhost:4175/Media-Management/'
 for(const [path,selector] of [
- ['equipment/','장비명, 모델명 검색'],['returns/','조회하기'],
+ ['equipment/','장비명, 모델명 검색'],['cart/','장바구니'],['checkout/','장바구니가 비어 있습니다.'],['returns/','조회하기'],
  ['admin/equipment/','장비 등록'],['admin/groups/','그룹 추가'],
  ['admin/loans/','신청 검색'],['admin/approvers/','승인자 추가'],
 ])test(`직접 접속과 새로고침: ${path}`,async({page})=>{
@@ -12,6 +12,7 @@ for(const [path,selector] of [
  const response=await page.goto(`${base}${path}?demo=1`)
  expect(response?.status()).toBe(200)
  if(path==='equipment/')await expect(page.getByPlaceholder(selector)).toBeVisible()
+ else if(path==='cart/'||path==='checkout/')await expect(page.getByRole('heading',{name:selector,exact:true})).toBeVisible()
  else if(selector==='신청 검색')await expect(page.getByLabel(selector,{exact:true})).toBeVisible()
  else await expect(page.getByRole('button',{name:selector,exact:true})).toBeVisible()
  expect((await page.reload())?.status()).toBe(200)
@@ -27,7 +28,7 @@ test('탭 URL, 뒤로/앞으로, 새 탭, 기존 관리자 URL 호환',async({pa
  await expect(page).toHaveURL(`${base}returns/?demo=1`)
  await page.goBack()
  await expect(page).toHaveURL(`${base}equipment/?demo=1`)
- await expect(page.getByRole('button',{name:'반출 신청하기'})).toBeVisible()
+ await expect(page.getByRole('link',{name:'장바구니',exact:true})).toBeVisible()
  await page.goForward()
  await expect(page.getByRole('button',{name:'조회하기',exact:true})).toBeVisible()
  await page.goto(`${base}?view=admin&demo=1`)

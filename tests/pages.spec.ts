@@ -10,5 +10,5 @@ test('Pages 하위 경로에서 앱과 이미지가 로드됨',async({page})=>{
  expect(images.every(i=>i.path?.startsWith('/Media-Management/')&&i.loaded)).toBe(true)
  expect(errors).toEqual([])
  await page.getByRole('button',{name:'무선 핸드 마이크 담기'}).click()
- await expect(page.getByRole('button',{name:'반출 신청하기'})).toBeVisible()
+ await expect(page.getByRole('link',{name:'장바구니',exact:true})).toBeVisible()
 })
