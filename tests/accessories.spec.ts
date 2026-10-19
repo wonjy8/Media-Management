@@ -80,6 +80,7 @@ test('모바일에서도 부속품 선택 화면이 넘치지 않음',async({pag
 test('실제 모드에서 연결 정보를 읽고 본체·부속품을 한 신청으로 전송하며 재고 오류를 보존',async({page})=>{
  const parent='90000000-0000-0000-0000-000000000001',child='90000000-0000-0000-0000-000000000002'
  const requests:{action:string;args:Record<string,unknown>}[]=[]
+ await page.context().route('**/rest/v1/equipment?*',route=>route.fulfill({json:[{id:parent,is_accessory:false},{id:child,is_accessory:true}]}))
  await page.context().route('**/rest/v1/equipment_accessories?*',route=>route.fulfill({json:[{equipment_id:parent,accessory_id:child,quantity:1,selected_by_default:true}]}))
  await page.context().route('**/functions/v1/equipment-api',route=>{
   const body=route.request().postDataJSON();requests.push(body)
@@ -101,7 +102,7 @@ test('실제 모드에서 연결 정보를 읽고 본체·부속품을 한 신�
 test('관리자 실제 저장은 장비와 부속품 연결을 하나의 RPC로 전송',async({page})=>{
  const parent='90000000-0000-0000-0000-000000000001',child='90000000-0000-0000-0000-000000000002'
  let payload:Record<string,unknown>|undefined
- const rows=[{id:parent,code:'SPK',name:'관리 스피커',model:'JBL',group_id:null,image_path:null,description:'',quantity:2,repair_quantity:0,active:true},{id:child,code:'CBL',name:'관리 충전선',model:'USB',group_id:null,image_path:null,description:'',quantity:2,repair_quantity:0,active:true}]
+ const rows=[{id:parent,code:'SPK',name:'관리 스피커',model:'JBL',group_id:null,image_path:null,description:'',quantity:2,repair_quantity:0,active:true},{id:child,code:'CBL',name:'관리 충전선',is_accessory:true,model:'USB',group_id:null,image_path:null,description:'',quantity:2,repair_quantity:0,active:true}]
  let links:unknown[]=[]
  await page.context().route('**/functions/v1/equipment-api',route=>{const {action}=route.request().postDataJSON();return route.fulfill({json:action==='catalog'?rows.map(r=>({id:r.id,code:r.code,name:r.name,model:r.model,group:'기타',qty:r.quantity,image:'',available:2})):[]})})
  await page.context().route('**/rest/v1/equipment?*',route=>route.fulfill({json:rows}))

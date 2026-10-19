@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 test.use({ launchOptions: { executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] } })
 test('서버 신청과 오류: 로컬 저장으로 대체하지 않음', async ({page}) => {
+ await page.context().route('**/rest/v1/equipment?*',route=>route.fulfill({json:[]}))
  await page.context().route('**/rest/v1/equipment_accessories?*',route=>route.fulfill({json:[]}))
  const calls: {action:string,args:Record<string,unknown>}[]=[]
  await page.context().route('**/functions/v1/equipment-api',async route=>{
