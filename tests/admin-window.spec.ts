@@ -16,7 +16,7 @@ test('관리자는 새 탭에서 열리고 사용자 선택 상태는 유지',as
  await expect(page.getByRole('link',{name:'장바구니',exact:true})).toBeVisible()
  await admin.setViewportSize({width:390,height:844})
  expect(await admin.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
- await admin.getByRole('link',{name:'승인자',exact:true}).click()
+ await admin.getByRole('link',{name:'PDF 서식',exact:true}).click()
  await expect(admin.getByRole('button',{name:'승인자 추가',exact:true})).toBeVisible()
  await admin.reload()
  await expect(admin.getByRole('navigation',{name:'관리 메뉴'})).toBeVisible()

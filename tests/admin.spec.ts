@@ -48,7 +48,8 @@ test('이미지 업로드는 1MB 이하 JPG로 압축',async({page})=>{
 })
 test('승인자 정보 등록 및 수정',async({page})=>{
  await page.goto('http://localhost:5173/admin/equipment/?demo=1')
- await page.getByRole('link',{name:'승인자',exact:true}).click()
+ await page.getByRole('link',{name:'PDF 서식',exact:true}).click()
+ await expect(page.getByRole('link',{name:'승인자',exact:true})).toHaveCount(0)
  await page.getByLabel('소속',{exact:true}).fill('미디어사역부')
  await page.getByLabel('직위',{exact:true}).fill('부장')
  await page.getByLabel('이름',{exact:true}).fill('관리자')

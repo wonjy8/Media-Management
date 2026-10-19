@@ -2,8 +2,12 @@ import {test,expect} from '@playwright/test'
 import {execFileSync} from 'node:child_process'
 test.use({launchOptions:{executablePath:'/usr/bin/chromium',args:['--no-sandbox']}})
 test('관리자 서식 편집·저장과 새 신청 서식 스냅샷',async({page})=>{
+ test.setTimeout(90000)
  await page.goto('http://localhost:5173/admin/pdf/?demo=1')
  await expect(page.getByLabel('문서 제목',{exact:true})).toHaveValue('장비 사용 신청서')
+ await page.getByLabel('이름',{exact:true}).fill('실제승인자')
+ await page.getByLabel('소속',{exact:true}).fill('미디어사역부')
+ await page.getByRole('button',{name:'승인자 추가',exact:true}).click()
  await page.getByLabel('문서 제목',{exact:true}).fill('미디어 장비 사용 확인서')
  await page.getByLabel('안내 문구 · 항목마다 줄바꿈').fill('원문 전체 안내를 보관합니다.\n반납 전에 모든 구성품을 확인해 주세요.')
  await page.getByLabel('관리번호 표시',{exact:true}).uncheck()
@@ -36,6 +40,7 @@ test('관리자 서식 편집·저장과 새 신청 서식 스냅샷',async({pag
  const text=execFileSync('pdftotext',['-layout','/tmp/media-template-frozen.pdf','-'],{encoding:'utf8'})
  expect(text).toContain('미디어 장비 사용 확인서');expect(text).not.toContain('새 버전 제목');expect(text).toContain('원문 전체 안내를 보관합니다.')
  expect(text).not.toContain('관리번호')
+ expect(text).toContain('실제승인자')
 })
 test('긴 문구와 장비명이 누락 없이 페이지를 나누고 서명은 마지막 장 하단에 유지',async({page})=>{
  await page.goto('http://localhost:5173/?demo=1')

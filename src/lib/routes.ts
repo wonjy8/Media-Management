@@ -10,7 +10,7 @@ export const routes = {
   'admin-groups': { path: 'admin/groups/', area: 'admin', tab: 'groups' },
   'admin-loans': { path: 'admin/loans/', area: 'admin', tab: 'loans' },
   'admin-pdf': { path: 'admin/pdf/', area: 'admin', tab: 'pdf' },
-  'admin-approvers': { path: 'admin/approvers/', area: 'admin', tab: 'approvers' },
+  'admin-approvers': { path: 'admin/approvers/', area: 'admin', tab: 'pdf' },
 } as const
 export type RouteKey = keyof typeof routes
 const base = import.meta.env.BASE_URL
@@ -23,6 +23,7 @@ export function routeHref(key: RouteKey) {
 function resolve() {
   const path = window.location.pathname.startsWith(base) ? window.location.pathname.slice(base.length).replace(/^\/+|\/+$/g, '') : '__unknown__'
   if (!path) return new URLSearchParams(window.location.search).get('view') === 'admin' ? 'admin-equipment' : 'equipment'
+  if (path === 'admin/approvers') return 'admin-pdf'
   if (path === 'admin') return 'admin-equipment'
   return (Object.keys(routes) as RouteKey[]).find(key => routes[key].path.replace(/\/$/, '') === path) ?? 'not-found'
 }
