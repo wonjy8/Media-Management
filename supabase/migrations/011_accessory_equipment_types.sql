@@ -59,7 +59,7 @@ begin
  if not public.is_admin() then raise exception 'FORBIDDEN' using errcode='42501';end if;
  perform pg_advisory_xact_lock(hashtext('equipment-accessory-roles'));
  if p_equipment?'is_accessory' and jsonb_typeof(p_equipment->'is_accessory') is distinct from 'boolean' then raise exception 'INVALID_REQUEST';end if;
- is_part:=coalesce((p_equipment->>'is_accessory')::boolean,false);
+ is_part:=coalesce((p_equipment->>'is_accessory')::boolean,(select is_accessory from equipment where id=p_id),false);
  if jsonb_typeof(p_parents) is distinct from 'array' or jsonb_typeof(p_accessories) is distinct from 'array' then raise exception 'INVALID_REQUEST';end if;
  if jsonb_array_length(p_parents)>50 or (is_part and (jsonb_array_length(p_parents)=0 or jsonb_array_length(p_accessories)>0)) or (not is_part and jsonb_array_length(p_parents)>0) then
   raise exception '부속품은 일반 장비에 하나 이상 연결해야 하며, 다른 부속품을 연결할 수 없습니다.' using errcode='23514';

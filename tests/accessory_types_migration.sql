@@ -7,6 +7,10 @@ begin
  other_id:=admin_save_equipment_with_accessories('{"name":"분류 테스트 본체B","code":"TYPE-B","quantity":2,"repair_quantity":0,"active":true,"is_accessory":false}','[]');
  child_id:=admin_save_equipment_with_accessories('{"name":"분류 테스트 부속품","code":null,"quantity":2,"repair_quantity":0,"active":true,"is_accessory":true}','[]',null,
   jsonb_build_array(jsonb_build_object('id',parent_id,'quantity',1,'selectedByDefault',true),jsonb_build_object('id',other_id,'quantity',1,'selectedByDefault',true)));
+ begin
+  perform admin_save_equipment_with_accessories('{"name":"이전 화면의 수정","code":null,"quantity":2,"repair_quantity":0,"active":true}','[]',child_id);
+  raise exception 'omitted flag cleared accessory classification';
+ exception when check_violation then null;end;
  if (select count(*) from equipment_accessories where accessory_id=child_id)<>2 then raise exception 'shared parents lost';end if;
  begin
   perform admin_save_equipment_with_accessories('{"name":"잘못된 분류","code":null,"quantity":1,"repair_quantity":0,"active":true,"is_accessory":true}','[]');
