@@ -55,3 +55,13 @@ npx playwright test --workers=1
 Google Sheets, 사용자 회원가입, 확인번호, 장비 세트, 보관 위치, 연장은 사용하지 않습니다.
 승인 기한은 신청일 제외 다음 일요일 + 7일이며 지연 표시용입니다. 미승인 자동 취소는 없습니다.
 각 클라우드 작업은 격리되어 있으므로 기존 체크아웃을 사용하며 별도 worktree는 만들지 않습니다.
+
+## GitHub Pages
+
+Settings → Pages → Source: **GitHub Actions**.
+Settings → Secrets and variables → Actions → Variables에 `VITE_SUPABASE_URL`,
+`VITE_SUPABASE_PUBLISHABLE_KEY`를 등록합니다. Secret/service_role 키는 사용하지 않습니다.
+`main`에 push하면 React 앱을 빌드해 `dist`만 배포합니다. Jekyll을 사용하지 않습니다.
+워크플로는 저장소 이름을 기준으로 `VITE_BASE_PATH`를 설정합니다.
+기본 주소: https://wonjy8.github.io/Media-Management/
+로컬 루트 개발은 기존대로 `npm run dev`를 사용합니다.
