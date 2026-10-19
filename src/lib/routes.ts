@@ -8,6 +8,7 @@ export const routes = {
   checkout: { path: 'checkout/', area: 'user', tab: 'checkout' },
   returns: { path: 'returns/', area: 'user', tab: 'returns' },
   'admin-equipment': { path: 'admin/equipment/', area: 'admin', tab: 'equipment' },
+  'admin-accessories': { path: 'admin/accessories/', area: 'admin', tab: 'accessories' },
   'admin-groups': { path: 'admin/groups/', area: 'admin', tab: 'groups' },
   'admin-loans': { path: 'admin/loans/', area: 'admin', tab: 'loans' },
   'admin-pdf': { path: 'admin/pdf/', area: 'admin', tab: 'pdf' },
