@@ -4,7 +4,7 @@ import { readFile, stat } from 'node:fs/promises'
 import { resolve, extname, sep } from 'node:path'
 const root = resolve('dist')
 const base = '/Media-Management/'
-const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.ttf':'font/ttf','.png':'image/png'}
+const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.ttf':'font/ttf','.png':'image/png'}
 createServer(async (req,res) => {
   try {
     const url = new URL(req.url, 'http://localhost')

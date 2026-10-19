@@ -72,7 +72,7 @@ test('전화번호 검증, 반려 작업 차단, 새 신청과 상태 테두리'
  await expect(page.locator('.loan-rejected')).toContainText('반려 사유: 행사 일정이 변경되었습니다.')
  await expect(page.locator('.loan-rejected')).toHaveCSS('border-top-color','rgb(204, 61, 61)')
  await expect(page.getByRole('button',{name:'선택한 장비 반납'})).toHaveCount(0)
- for(const name of ['수정','신청 취소','PDF 저장','선택한 장비 반납'])await expect(page.locator('.loan-rejected').getByRole('button',{name,exact:true})).toHaveCount(0)
+ for(const name of ['수정','신청 취소','신청서 PDF 보기','선택한 장비 반납'])await expect(page.locator('.loan-rejected').getByRole('button',{name,exact:true})).toHaveCount(0)
  await expect(admin.locator('.loan-rejected').getByRole('button',{name:'PDF 저장',exact:true})).toHaveCount(0)
  await page.getByRole('link',{name:'장비 찾기',exact:true}).click()
  await page.getByRole('button',{name:'무선 핸드 마이크 담기'}).click()

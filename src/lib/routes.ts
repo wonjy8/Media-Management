@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { MouseEvent } from 'react'
 
 export const routes = {
+  'application-pdf': { path: 'application-pdf/', area: 'user', tab: 'pdf' },
   equipment: { path: 'equipment/', area: 'user', tab: 'equipment' },
   cart: { path: 'cart/', area: 'user', tab: 'cart' },
   checkout: { path: 'checkout/', area: 'user', tab: 'checkout' },
