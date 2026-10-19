@@ -82,3 +82,4 @@ select public.anonymize_expired_loans();
 신청 반려와 통합 승인 기능은 `migrations/006_application_review.sql`까지 실행하고 최신 `equipment-api`를 배포하세요.
 
 반려 신청 수정·취소 제한은 `migrations/007_rejection_final.sql`까지 실행하세요.
+PDF 새 레이아웃·관리자 서식 설정은 `migrations/008_pdf_templates.sql`까지 실행하세요. Edge Function 재배포는 필요하지 않습니다.

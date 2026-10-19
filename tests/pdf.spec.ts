@@ -32,7 +32,10 @@ test('A4 다중 페이지 PDF: 한글과 마지막 장 승인자 보존',async({
  for(const p of pdf.getPages()){expect(p.getWidth()).toBeCloseTo(595.28,0);expect(p.getHeight()).toBeCloseTo(841.89,0)}
  const text=execFileSync('pdftotext',['-layout','/tmp/media-loan-test.pdf','-'],{encoding:'utf8'})
  const pages=text.split('\f').filter(p=>p.trim())
- expect(text.replace(/\s+/g,'')).toContain('집기반출및폐기대장')
+ expect(text.replace(/\s+/g,'')).toContain('장비사용신청서')
+ expect(pages.slice(1).every(p=>!p.replace(/\s+/g,'').includes('장비사용신청서'))).toBe(true)
+ expect(text.replace(/\s+/g,'')).toContain('추후장비문제가있을경우책임을물을수있습니다.')
+ expect(text.replace(/\s+/g,'')).toContain('1부는관리부에서보관합니다.')
  expect(text).toContain('신청자성명')
  expect(text).not.toContain('01000000000')
  expect(text).not.toContain('승인 대기')
@@ -43,12 +46,12 @@ test('A4 다중 페이지 PDF: 한글과 마지막 장 승인자 보존',async({
  expect(pages.at(-1)).toContain('승인자성명')
  expect(pages.slice(0,-1).every(p=>!p.includes('승인자성명'))).toBe(true)
  const last=String(pdf.getPageCount())
- const rendered=spawnSync('pdftoppm',['-f',last,'-l',last,'-scale-to','1100','-singlefile','/tmp/media-loan-test.pdf','/tmp/media-pdf-visual'],{encoding:'utf8'})
+ const rendered=spawnSync('pdftoppm',['-f','1','-l','1','-scale-to','1100','-singlefile','/tmp/media-loan-test.pdf','/tmp/media-pdf-visual'],{encoding:'utf8'})
  expect(rendered.status).toBe(0);expect(rendered.stderr).toBe('')
  const ppm=readFileSync('/tmp/media-pdf-visual.ppm')
  const header=/^P6\s+(\d+)\s+(\d+)\s+255\s/.exec(ppm.toString('ascii',0,80))!
  const pixels=ppm.subarray(header[0].length),width=Number(header[1]);let ink=0
- for(let y=65;y<100;y++)for(let x=100;x<700;x++){const i=(y*width+x)*3;if(pixels[i]<120&&pixels[i+1]<120&&pixels[i+2]<120)ink++}
+ for(let y=125;y<175;y++)for(let x=60;x<600;x++){const i=(y*width+x)*3;if(pixels[i]<120&&pixels[i+1]<120&&pixels[i+2]<120)ink++}
  // Text extraction alone can pass with a broken glyph map; also check rendered title ink.
  expect(ink).toBeGreaterThan(700)
  const bbox=execFileSync('pdftotext',['-f',last,'-l',last,'-bbox','/tmp/media-loan-test.pdf','-'],{encoding:'utf8'})

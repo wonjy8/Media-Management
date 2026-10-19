@@ -5,7 +5,7 @@ const base='http://localhost:4175/Media-Management/'
 for(const [path,selector] of [
  ['equipment/','장비명, 모델명 검색'],['cart/','장바구니'],['checkout/','장바구니가 비어 있습니다.'],['returns/','조회하기'],
  ['admin/equipment/','장비 등록'],['admin/groups/','그룹 추가'],
- ['admin/loans/','신청 검색'],['admin/approvers/','승인자 추가'],
+ ['admin/loans/','신청 검색'],['admin/approvers/','승인자 추가'],['admin/pdf/','서식 저장'],
 ])test(`직접 접속과 새로고침: ${path}`,async({page})=>{
  expect(existsSync(`dist/${path}index.html`)).toBe(true)
  expect(readFileSync(`dist/${path}index.html`,'utf8')).toContain('/Media-Management/assets/')

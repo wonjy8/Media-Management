@@ -9,6 +9,7 @@ export const routes = {
   'admin-equipment': { path: 'admin/equipment/', area: 'admin', tab: 'equipment' },
   'admin-groups': { path: 'admin/groups/', area: 'admin', tab: 'groups' },
   'admin-loans': { path: 'admin/loans/', area: 'admin', tab: 'loans' },
+  'admin-pdf': { path: 'admin/pdf/', area: 'admin', tab: 'pdf' },
   'admin-approvers': { path: 'admin/approvers/', area: 'admin', tab: 'approvers' },
 } as const
 export type RouteKey = keyof typeof routes
