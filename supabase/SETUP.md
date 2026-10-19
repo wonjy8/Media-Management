@@ -77,3 +77,5 @@ select public.anonymize_expired_loans();
 - 반납과 수정 충돌, 개인정보 익명화, 대량 조회 제한이 실제 환경에서 동작하는지
 
 장비 목록 API 연결은 확인했습니다. 이후 관리자 로그인·새 스키마/서버 기능의 원격 검증은 별도로 필요합니다.
+
+그룹·장비 삭제 기능은 `migrations/005_catalog_delete.sql`도 SQL Editor에서 실행하세요. 기존 프로젝트는 `UPGRADE.sql` 전체에 포함되어 있습니다.

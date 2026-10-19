@@ -1,8 +1,10 @@
 import {test,expect} from '@playwright/test'
 test.use({launchOptions:{executablePath:'/usr/bin/chromium',args:['--no-sandbox']}})
-test('관리자는 새 창에서 열리고 사용자 선택 상태는 유지',async({page})=>{
+test('관리자는 새 탭에서 열리고 사용자 선택 상태는 유지',async({page})=>{
  await page.goto('http://localhost:5173/?demo=1')
  await page.getByRole('button',{name:'무선 핸드 마이크 담기',exact:true}).click()
+ await expect(page.getByRole('link',{name:'관리자',exact:false})).toHaveAttribute('target','_blank')
+ expect(await page.getByRole('link',{name:'관리자',exact:false}).evaluate(el=>el.getAttribute('onclick'))).toBeNull()
  const popup=page.waitForEvent('popup')
  await page.getByRole('link',{name:'관리자',exact:false}).click()
  const admin=await popup
