@@ -15,6 +15,7 @@ test('신청, 반출, 부분 반납', async ({page})=>{
  await expect(page.getByText('신청이 완료되었어요')).toBeVisible()
  await page.getByRole('button',{name:'닫기',exact:true}).click()
  await page.getByRole('button',{name:'관리자',exact:false}).click()
+ await page.getByRole('button',{name:'반출 · 반납',exact:true}).click()
  await page.getByRole('button',{name:'승인',exact:true}).click()
  await page.getByRole('button',{name:'실제 반출 확인'}).click()
  await page.getByRole('button',{name:'신청 조회 · 반납'}).click()

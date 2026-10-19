@@ -12,6 +12,8 @@
 
 1. `migrations/001_initial.sql`
 2. `migrations/002_workflow.sql`
+3. `migrations/003_equipment_management.sql`
+4. `migrations/004_complete_workflow.sql`
 
 기존 테이블이 있다면 먼저 백업하고 충돌을 확인하세요. 위 스크립트는 최초 설치용입니다.
 공개 사용자에게 `loans`, `loan_items` SELECT 권한을 추가하지 마세요.
@@ -44,9 +46,8 @@ insert into public.admins(user_id) values ('여기에 관리자 사용자 UUID')
 ```
 
 일반 대여자는 계정을 만들 필요가 없습니다.
-장비는 Table Editor의 `groups`, `equipment`에 등록합니다.
-수리 필요 수량은 `repair_quantity`, 비활성화는 `active=false`로 관리할 수 있습니다.
-장비 이미지 URL은 `image_path`에 입력합니다. 관리자 업로드 화면은 아직 없습니다.
+장비·그룹·이미지·수리 수량·승인자는 앱의 관리자 화면에서 관리합니다.
+기존 설치를 업데이트하는 경우 [UPGRADE.md](UPGRADE.md)를 참고하세요.
 
 ## 4. 개인정보 자동 정리
 
@@ -75,4 +76,4 @@ select public.anonymize_expired_loans();
 - 관리자만 승인·반출·반납 취소를 할 수 있는지
 - 반납과 수정 충돌, 개인정보 익명화, 대량 조회 제한이 실제 환경에서 동작하는지
 
-실제 프로젝트 연결과 배포는 현재 권한/네트워크로 확인되지 않았습니다.
+장비 목록 API 연결은 확인했습니다. 이후 관리자 로그인·새 스키마/서버 기능의 원격 검증은 별도로 필요합니다.
