@@ -1,3 +1,4 @@
+import {displayedCode} from './equipmentCodes'
 import {supabase,demoMode} from './supabase'
 import {allPages,downloadCsv} from './csv'
 import type {CsvValue} from './csv'
@@ -6,10 +7,10 @@ import type {Equipment,Loan,Snapshot} from './domain'
 
 type ReturnEvent={id:string;loanId:string;quantities:Record<string,number>;notes:string;createdAt:string;reversedAt?:string|null;reversalReason?:string}
 type ExportLoan=Loan&{cancelledAt?:string|null}
-type DbEquipment={id:string;code:string;name:string;model:string|null;group_id:string|null;quantity:number;repair_quantity:number;active:boolean;description:string|null;image_path:string|null}
+type DbEquipment={id:string;code:string|null;name:string;model:string|null;group_id:string|null;quantity:number;repair_quantity:number;active:boolean;description:string|null;image_path:string|null}
 type DbLoan={id:string;number:string;borrower_name:string|null;borrower_phone:string|null;borrower_department:string;borrower_position:string;reason:string;application_note:string|null;start_date:string;end_date:string;created_at:string;approved_at:string|null;checked_out_at:string|null;cancelled_at:string|null;rejected_at:string|null;rejection_reason:string|null;loan_items:{equipment_id:string;quantity:number;returned_quantity:number;equipment_snapshot:Snapshot}[]}
 export function equipmentCsv(items:Equipment[]):CsvValue[][]{
- return [['관리번호','장비명','모델','그룹','총 수량','수리 필요 수량','대여 대상 수량','표시 상태','설명','이미지'],...items.map(e=>[e.code||e.id,e.name,e.model,e.group,e.qty,e.repair||0,e.active===false?0:Math.max(0,e.qty-(e.repair||0)),e.active===false?'비활성':'표시',e.description||'',e.image||''])]
+ return [['관리번호','장비명','모델','그룹','총 수량','수리 필요 수량','대여 대상 수량','표시 상태','설명','이미지'],...items.map(e=>[e.code||'',e.name,e.model,e.group,e.qty,e.repair||0,e.active===false?0:Math.max(0,e.qty-(e.repair||0)),e.active===false?'비활성':'표시',e.description||'',e.image||''])]
 }
 export function koreanTime(value?:string|null){
  if(!value||Number.isNaN(Date.parse(value)))return ''
@@ -21,7 +22,7 @@ export function movementCsv(loans:ExportLoan[],equipment:Equipment[],events:Retu
  const headers=['처리일시 (한국시간)','구분','신청번호','현재 신청상태','이름','전화번호','소속','직위','대여 사유','반출일','반납 예정일','관리번호','장비명','장비 소속','수량','현재 반납 수량','현재 미반납 수량','비고']
  const records:{time:number;row:CsvValue[]}[]=[]
  for(const loan of loans){
-  const add=(kind:string,at:string|undefined|null,quantities:Record<string,number>,note='')=>{for(const [id,quantity] of Object.entries(quantities)){const eq=equipment.find(e=>e.id===id),snap=loan.snapshots?.[id];records.push({time:at?Date.parse(at):Number.MAX_SAFE_INTEGER,row:[koreanTime(at),kind,loan.id,loanState(loan),loan.name||'익명',loan.phone||'',loan.department||'',loan.position||'',loan.reason,loan.start,loan.end,snap?.code||eq?.code||id,snap?.name||eq?.name||'장비',snap?.department||eq?.group||'',quantity,loan.returned[id]||0,loan.out?Math.max(0,(loan.items[id]||0)-(loan.returned[id]||0)):0,note]})}}
+  const add=(kind:string,at:string|undefined|null,quantities:Record<string,number>,note='')=>{for(const [id,quantity] of Object.entries(quantities)){const eq=equipment.find(e=>e.id===id),snap=loan.snapshots?.[id];records.push({time:at?Date.parse(at):Number.MAX_SAFE_INTEGER,row:[koreanTime(at),kind,loan.id,loanState(loan),loan.name||'익명',loan.phone||'',loan.department||'',loan.position||'',loan.reason,loan.start,loan.end,displayedCode(snap,eq),snap?.name||eq?.name||'장비',snap?.department||eq?.group||'',quantity,loan.returned[id]||0,loan.out?Math.max(0,(loan.items[id]||0)-(loan.returned[id]||0)):0,note]})}}
   if(loan.out)add('반출',loan.checkoutAt,loan.items)
   else add(loan.rejected?'반려':loan.cancelled?'신청 취소':'현재 신청',loan.rejected?loan.rejectedAt:loan.cancelled?loan.cancelledAt:loan.createdAt,loan.items,loan.rejected?loan.rejectionReason||'':loan.note||'')
   const returns=events.filter(e=>e.loanId===(loan.databaseId||loan.id))

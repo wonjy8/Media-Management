@@ -1,3 +1,4 @@
+import {displayedCode} from './equipmentCodes'
 import { PDFDocument,rgb,PageSizes } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import type { Loan,Equipment } from './domain'
@@ -7,7 +8,7 @@ export async function createLegacyLoanPdf(loan:Loan,equipment:Equipment[]){
  fontBytes??=fetch(`${import.meta.env.BASE_URL}fonts/NanumGothic-Regular.ttf`).then(r=>{if(!r.ok)throw Error('PDF 글꼴을 불러오지 못했습니다.');return r.arrayBuffer()}).catch(e=>{fontBytes=undefined;throw e})
  const font=await doc.embedFont(await fontBytes,{subset:false});const [width,height]=PageSizes.A4;const margin=32;const tableWidth=width-margin*2
  const lines=(text:string,maxWidth:number,size=10)=>{const result:string[]=[];for(const paragraph of text.split('\n')){let line='';for(const ch of paragraph){if(font.widthOfTextAtSize(line+ch,size)>maxWidth&&line){result.push(line);line=ch}else line+=ch}result.push(line)}return result}
- const entries=Object.entries(loan.items).map(([id,q],index)=>{const snap=loan.snapshots?.[id],e=equipment.find(e=>e.id===id);return [String(index+1),snap?.code||e?.code||id,snap?.name||e?.name||'장비',String(q),snap?.department||e?.group||'', '']})
+ const entries=Object.entries(loan.items).map(([id,q],index)=>{const snap=loan.snapshots?.[id],e=equipment.find(e=>e.id===id);return [String(index+1),displayedCode(snap,e).replace(/,\s*/g,',\n'),snap?.name||e?.name||'장비',String(q),snap?.department||e?.group||'', '']})
  const cols=[30,75,171,38,133,tableWidth-447];const rowHeights=entries.map(row=>Math.max(30,...row.map((cell,i)=>lines(cell,cols[i]-12).length*14+14)))
  const approvals=loan.approvers||[];const signatureHeight=148+Math.max(1,approvals.length)*32
  const noteLines=lines(`특이사항: ${loan.note||'-'}`,tableWidth-16,9)

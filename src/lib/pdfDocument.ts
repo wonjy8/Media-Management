@@ -1,3 +1,4 @@
+import {displayedCode} from './equipmentCodes'
 import {PDFDocument,rgb,PageSizes} from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import type {Loan,Equipment} from './domain'
@@ -25,7 +26,7 @@ export async function createLoanPdf(loan:Loan,equipment:Equipment[]){
  const totalWeight=columns.reduce((n,c)=>n+weights[c.key],0),widths=columns.map(c=>CW*weights[c.key]/totalWeight)
  const headerLines=columns.map((c,i)=>wrap(c.label,widths[i]-(c.key==='number'?6:16),fs-1)),headerH=Math.max(27,...headerLines.map(l=>l.length*(fs+2)+14))
  const entries=Object.entries(loan.items)
- const rows=entries.map(([id,quantity],index)=>{const e=equipment.find(e=>e.id===id),s=loan.snapshots?.[id];const values:Record<ColumnKey,string>={number:String(index+1),code:s?.code||e?.code||id,name:s?.name||e?.name||'장비',quantity:String(quantity),department:s?.department||e?.group||'',check:''};const cells=columns.map((c,i)=>c.key==='number'||c.key==='quantity'?[values[c.key]]:wrap(values[c.key],widths[i]-16,c.key==='code'?fs-1:fs));return {cells,height:Math.max(t.rowHeight,...cells.map(c=>c.length*lh+14))}})
+ const rows=entries.map(([id,quantity],index)=>{const e=equipment.find(e=>e.id===id),s=loan.snapshots?.[id];const values:Record<ColumnKey,string>={number:String(index+1),code:displayedCode(s,e).replace(/,\s*/g,',\n'),name:s?.name||e?.name||'장비',quantity:String(quantity),department:s?.department||e?.group||'',check:''};const cells=columns.map((c,i)=>c.key==='number'||c.key==='quantity'?[values[c.key]]:wrap(values[c.key],widths[i]-16,c.key==='code'?fs-1:fs));return {cells,height:Math.max(t.rowHeight,...cells.map(c=>c.length*lh+14))}})
  const org=[t.organization,t.department].filter(Boolean).join(' ')
  const date=(value:string)=>value.replace(/-/g,'. ')+'.'
  const period=`${date(loan.start)} – ${loan.start.slice(0,4)===loan.end.slice(0,4)?date(loan.end.slice(5)):date(loan.end)}`
