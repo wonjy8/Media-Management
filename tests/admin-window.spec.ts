@@ -1,0 +1,23 @@
+import {test,expect} from '@playwright/test'
+test.use({launchOptions:{executablePath:'/usr/bin/chromium',args:['--no-sandbox']}})
+test('관리자는 새 창에서 열리고 사용자 선택 상태는 유지',async({page})=>{
+ await page.goto('http://localhost:5173/?demo=1')
+ await page.getByRole('button',{name:'무선 핸드 마이크 담기',exact:true}).click()
+ const popup=page.waitForEvent('popup')
+ await page.getByRole('link',{name:'관리자',exact:false}).click()
+ const admin=await popup
+ await expect(admin).toHaveURL(/view=admin/)
+ await expect(page).not.toHaveURL(/view=admin/)
+ await expect(admin.getByRole('navigation',{name:'관리 메뉴'})).toBeVisible()
+ await expect(admin.getByRole('button',{name:'장비 등록',exact:true})).toBeVisible()
+ await expect(admin.getByRole('button',{name:'장비 찾기',exact:true})).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'반출 신청하기'})).toBeVisible()
+ await admin.setViewportSize({width:390,height:844})
+ expect(await admin.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+ await admin.getByRole('button',{name:'승인자',exact:true}).click()
+ await expect(admin.getByRole('button',{name:'승인자 추가',exact:true})).toBeVisible()
+ await admin.reload()
+ await expect(admin.getByRole('navigation',{name:'관리 메뉴'})).toBeVisible()
+ await admin.close()
+ await expect(page.getByRole('button',{name:'반출 신청하기'})).toBeVisible()
+})

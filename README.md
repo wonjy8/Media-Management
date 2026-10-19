@@ -57,3 +57,12 @@ main에 push하면 React dist를 자동 배포합니다. Jekyll을 사용하지 
 https://wonjy8.github.io/Media-Management/
 
 PDF 글꼴은 Nanum Gothic (SIL OFL). [라이선스](public/fonts/LICENSE.txt).
+
+## 관리자 전용 창
+
+사용자 화면의 관리자 링크는 별도 창을 엽니다. 전용 주소는
+https://wonjy8.github.io/Media-Management/?view=admin 입니다.
+직접 접속·새로고침 시에도 관리자 인증을 확인합니다.
+PC는 왼쪽 메뉴, 모바일은 상단 관리 메뉴를 사용합니다.
+사용자 창의 선택 상태는 유지하며 창 활성화 시 최신 장비/대여 내역을 갱신합니다.
+이 UI 변경에는 추가 SQL이나 Edge Function 재배포가 필요하지 않습니다.

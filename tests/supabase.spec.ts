@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 test.use({ launchOptions: { executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] } })
 test('서버 신청과 오류: 로컬 저장으로 대체하지 않음', async ({page}) => {
  const calls: {action:string,args:Record<string,unknown>}[]=[]
- await page.route('**/functions/v1/equipment-api',async route=>{
+ await page.context().route('**/functions/v1/equipment-api',async route=>{
   const body=route.request().postDataJSON();calls.push(body)
   if(body.action==='catalog')return route.fulfill({json:[{id:'123',name:'서버 마이크',model:'TEST',group:'음향',qty:2,available:2,image:null}]})
   if(body.action==='create')return route.fulfill({status:400,json:{error:'다른 신청으로 대여 가능 수량이 변경되었습니다.'}})
@@ -26,11 +26,14 @@ test('서버 신청과 오류: 로컬 저장으로 대체하지 않음', async (
  expect(await page.evaluate(()=>localStorage.getItem('media-loans'))).toBeNull()
 })
 test('연결 실패 시 예시 장비를 실제 장비로 표시하지 않음',async({page})=>{
- await page.route('**/functions/v1/equipment-api',route=>route.fulfill({status:500,json:{error:'연결 실패'}}))
+ await page.context().route('**/functions/v1/equipment-api',route=>route.fulfill({status:500,json:{error:'연결 실패'}}))
  await page.goto('http://localhost:5173')
  await expect(page.getByRole('alert')).toContainText('장비 목록을 불러오지 못했습니다')
  await expect(page.locator('.card')).toHaveCount(0)
- await page.getByRole('button',{name:'관리자',exact:false}).click()
- await expect(page.getByRole('heading',{name:'관리자 로그인'})).toBeVisible()
- await expect(page.getByRole('button',{name:'실제 반출 확인'})).toHaveCount(0)
+ const popup=page.waitForEvent('popup')
+ await page.getByRole('link',{name:'관리자',exact:false}).click()
+ const admin=await popup
+ await expect(admin.getByRole('heading',{name:'관리자 로그인'})).toBeVisible()
+ await expect(admin.getByRole('button',{name:'실제 반출 확인'})).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'장비 찾기',exact:true})).toBeVisible()
 })
