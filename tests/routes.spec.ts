@@ -45,3 +45,20 @@ test('알 수 없는 경로는 404로 안내',async({page})=>{
  expect(response?.status()).toBe(404)
  await expect(page.getByRole('heading',{name:'페이지를 찾을 수 없습니다.'})).toBeVisible()
 })
+test('사용자 탭의 콘텐츠 여백과 로고 헤더는 PC·모바일에서 동일',async({page})=>{
+ for(const width of [1440,390]){
+  await page.setViewportSize({width,height:900})
+  const boxes=[]
+  for(const path of ['equipment','cart','returns']){
+   await page.goto(`http://localhost:5173/${path}/?demo=1`)
+   const brand=page.locator('.church-identity')
+   await expect(brand).toContainText('서울영동교회 미디어사역부')
+   await expect(brand.locator('img')).toBeVisible()
+   const bounds=await page.locator('.user-app>main>section').boundingBox()
+   boxes.push(bounds!)
+   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+   expect((await brand.boundingBox())!.y).toBeLessThan((await page.getByRole('navigation',{name:'사용자 메뉴'}).boundingBox())!.y)
+  }
+  expect(boxes.map(b=>[b.x,b.y,b.width])).toEqual(Array(3).fill([boxes[0].x,boxes[0].y,boxes[0].width]))
+ }
+})

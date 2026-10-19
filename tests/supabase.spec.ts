@@ -13,7 +13,7 @@ test('서버 신청과 오류: 로컬 저장으로 대체하지 않음', async (
  await expect(page.getByText('미리보기 모드',{exact:false})).toHaveCount(0)
  await page.getByRole('button',{name:'서버 마이크 담기'}).click()
  await page.getByRole('link',{name:'장바구니',exact:true}).click()
- await page.getByRole('button',{name:'대여하기',exact:true}).click()
+ await page.getByRole('button',{name:'사용 신청하기',exact:true}).click()
  const dialog=page.locator('.checkout-page')
  await dialog.getByLabel('이름',{exact:true}).fill('테스트')
  await dialog.getByLabel('전화번호').fill('01012345678')

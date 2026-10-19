@@ -5,7 +5,7 @@ test('신청, 반출, 부분 반납', async ({page})=>{
  await page.getByRole('button',{name:'무선 핸드 마이크 담기'}).click()
  await page.getByRole('button',{name:'무선 핸드 마이크 담기'}).click()
  await page.getByRole('link',{name:'장바구니',exact:true}).click()
- await page.getByRole('button',{name:'대여하기',exact:true}).click()
+ await page.getByRole('button',{name:'사용 신청하기',exact:true}).click()
  const dialog=page.locator('.checkout-page')
  await dialog.getByLabel('이름',{exact:true}).fill('테스트')
  await dialog.getByLabel('전화번호').fill('01000000000')
