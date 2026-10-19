@@ -1,4 +1,4 @@
-# 이음 · 교회 장비 대여
+# 서울영동교회 미디어사역부
 
 React / TypeScript / Vite 기반 교회 장비 대여 앱입니다. Supabase 연결 코드는 준비되었으며 실제 프로젝트의 스키마/Edge Function 배포가 필요합니다.
 
