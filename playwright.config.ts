@@ -14,5 +14,10 @@ export default defineConfig({
       url: 'http://localhost:4174/Media-Management/',
       reuseExistingServer: !process.env.CI,
     },
+    {
+      command: 'node scripts/serve-pages.mjs',
+      url: 'http://localhost:4175/Media-Management/',
+      reuseExistingServer: !process.env.CI,
+    },
   ],
 })

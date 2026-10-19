@@ -17,11 +17,11 @@ test('신청, 반출, 부분 반납', async ({page})=>{
  const popup=page.waitForEvent('popup')
  await page.getByRole('link',{name:'관리자',exact:false}).click()
  const admin=await popup
- await admin.getByRole('button',{name:'반출 · 반납',exact:true}).click()
+ await admin.getByRole('link',{name:'반출 · 반납',exact:true}).click()
  await admin.getByRole('button',{name:'승인',exact:true}).click()
  await admin.getByRole('button',{name:'실제 반출 확인'}).click()
  await admin.close()
- await page.getByRole('button',{name:'신청 조회 · 반납'}).click()
+ await page.getByRole('link',{name:'신청 조회 · 반납'}).click()
  await page.getByLabel('이름',{exact:true}).fill('테스트')
  await page.getByLabel('전화번호').fill('01000000000')
  await page.getByRole('button',{name:'조회하기'}).click()

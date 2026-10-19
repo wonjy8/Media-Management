@@ -61,8 +61,27 @@ PDF 글꼴은 Nanum Gothic (SIL OFL). [라이선스](public/fonts/LICENSE.txt).
 ## 관리자 전용 창
 
 사용자 화면의 관리자 링크는 별도 창을 엽니다. 전용 주소는
-https://wonjy8.github.io/Media-Management/?view=admin 입니다.
+https://wonjy8.github.io/Media-Management/admin/equipment/ 입니다.
 직접 접속·새로고침 시에도 관리자 인증을 확인합니다.
 PC는 왼쪽 메뉴, 모바일은 상단 관리 메뉴를 사용합니다.
 사용자 창의 선택 상태는 유지하며 창 활성화 시 최신 장비/대여 내역을 갱신합니다.
 이 UI 변경에는 추가 SQL이나 Edge Function 재배포가 필요하지 않습니다.
+
+## 탭별 URL
+
+배포 주소의 `/Media-Management/` 아래에 다음 경로가 있습니다.
+
+| 화면 | 경로 |
+| --- | --- |
+| 장비 찾기 | `equipment/` |
+| 신청 조회·반납 | `returns/` |
+| 장비 관리 | `admin/equipment/` |
+| 그룹 관리 | `admin/groups/` |
+| 반출·반납 관리 | `admin/loans/` |
+| 승인자 관리 | `admin/approvers/` |
+
+탭은 실제 링크이며, 주소 공유/새 탭/직접 접속/새로고침/브라우저 뒤로·앞으로 이동을 지원합니다.
+루트와 기존 `?view=admin` 링크는 기본 탭 주소로 정리합니다.
+GitHub Pages는 SPA rewrite를 제공하지 않으므로 빌드 시 `scripts/build-routes.mjs`가
+각 경로의 index.html을 만듭니다. 별도 서버 설정이나 404 리다이렉트는 필요하지 않습니다.
+라우트 테스트는 Vite fallback 없이 정적 파일만 제공하는 테스트 서버에서 HTTP 200을 확인합니다.

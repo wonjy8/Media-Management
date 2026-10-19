@@ -35,5 +35,5 @@ test('연결 실패 시 예시 장비를 실제 장비로 표시하지 않음',a
  const admin=await popup
  await expect(admin.getByRole('heading',{name:'관리자 로그인'})).toBeVisible()
  await expect(admin.getByRole('button',{name:'실제 반출 확인'})).toHaveCount(0)
- await expect(page.getByRole('button',{name:'장비 찾기',exact:true})).toBeVisible()
+ await expect(page.getByRole('link',{name:'장비 찾기',exact:true})).toBeVisible()
 })
