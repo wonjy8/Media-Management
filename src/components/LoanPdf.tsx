@@ -7,6 +7,7 @@ export default function LoanPdf({loan,equipment,onReady}:{loan:Loan;equipment:Eq
  const [state,setState]=useState('PDF 미리보기 준비 중…')
  useEffect(()=>{
   let live=true
+  const controller=new AbortController()
   let destroy:(()=>void)|undefined
   const root=container.current!
   queueMicrotask(()=>{if(live){setState('PDF 미리보기 준비 중…');onReady?.(false)}})
@@ -15,7 +16,7 @@ export default function LoanPdf({loan,equipment,onReady}:{loan:Loan;equipment:Eq
     const [{createLoanPdf},pdfjs]=await Promise.all([import('../lib/pdf'),import('pdfjs-dist')])
     if(!live)return
     pdfjs.GlobalWorkerOptions.workerSrc=workerUrl
-    const blob=await createLoanPdf(loan,equipment)
+    const blob=await createLoanPdf(loan,equipment,controller.signal)
     if(!live)return
     const task=pdfjs.getDocument({data:new Uint8Array(await blob.arrayBuffer())})
     destroy=()=>{void task.destroy()}
@@ -34,7 +35,7 @@ export default function LoanPdf({loan,equipment,onReady}:{loan:Loan;equipment:Eq
     if(live){root.replaceChildren(...pages);setState('');onReady?.(true)}
    }catch{if(live)setState('미리보기를 불러오지 못했습니다. PDF 저장하기로 확인해 주세요.')}
   })()
-  return()=>{live=false;destroy?.()}
+  return()=>{live=false;controller.abort();destroy?.()}
  },[loan,equipment,onReady])
  return <section className="pdf-preview" aria-label="신청서 PDF 미리보기">{state&&<p role="status">{state}</p>}<div ref={container}/></section>
 }
