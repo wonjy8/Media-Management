@@ -19,6 +19,8 @@ test('서버 신청과 오류: 로컬 저장으로 대체하지 않음', async (
  await dialog.getByLabel('전화번호').fill('01012345678')
  await dialog.getByLabel('반출일',{exact:true}).fill('2026-11-01')
  await dialog.getByLabel('반납 예정일').fill('2026-11-03')
+ await dialog.getByLabel('소속',{exact:true}).fill('청년부')
+ await dialog.getByLabel('직위',{exact:true}).fill('팀원')
  await dialog.getByLabel('대여 사유').fill('테스트')
  await dialog.getByRole('button',{name:'신청 완료',exact:true}).click()
  await expect(page.getByRole('status')).toContainText('대여 가능 수량이 변경')

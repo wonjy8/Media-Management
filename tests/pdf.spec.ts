@@ -17,6 +17,8 @@ test('A4 다중 페이지 PDF: 한글과 마지막 장 승인자 보존',async({
  await d.getByLabel('이름',{exact:true}).fill('신청자성명')
  await d.getByLabel('전화번호').fill('01000000000')
  await d.getByLabel('소속',{exact:true}).fill('청년부')
+ await d.getByLabel('소속',{exact:true}).fill('청년부')
+ await d.getByLabel('직위',{exact:true}).fill('팀원')
  await d.getByLabel('대여 사유').fill('수련회')
  await expect(d.getByLabel('특이사항',{exact:true})).toHaveCount(0)
  await d.getByRole('button',{name:'신청 완료',exact:true}).click()

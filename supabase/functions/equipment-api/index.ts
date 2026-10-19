@@ -31,6 +31,7 @@ Deno.serve(async req => {
       if (String(args.note || '').length > 2000) return respond({ error: '특이사항은 2,000자 이하로 입력해 주세요.' }, 400)
     }
     if (['create','update'].includes(action) && (typeof args.phone!=='string'||!/^010[0-9]{8}$/.test(args.phone))) return respond({error:'전화번호는 010으로 시작하는 숫자 11자리로 입력해 주세요. (- 없이)'},400)
+    if(['create','update'].includes(action) && ['department','position'].some(field=>typeof args[field]!=='string'||!args[field].trim()||args[field].trim().length>80)) return respond({error:'소속과 직위를 입력해 주세요.'},400)
     if(action==='reject' && (typeof args.reason!=='string'||!args.reason.trim()||args.reason.length>500)) return respond({error:'반려 사유를 1~500자로 입력해 주세요.'},400)
     if(['create','update'].includes(action))args.note=''
     if(action==='return')args.photoPaths=[]
