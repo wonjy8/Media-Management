@@ -2,7 +2,7 @@ import { PDFDocument,rgb,PageSizes } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import type { Loan,Equipment } from './domain'
 let fontBytes:Promise<ArrayBuffer>|undefined
-export async function downloadLoanPdf(loan:Loan,equipment:Equipment[]){
+export async function createLoanPdf(loan:Loan,equipment:Equipment[]){
  const doc=await PDFDocument.create();doc.registerFontkit(fontkit)
  fontBytes??=fetch(`${import.meta.env.BASE_URL}fonts/NanumGothic-Regular.ttf`).then(r=>{if(!r.ok)throw Error('PDF 글꼴을 불러오지 못했습니다.');return r.arrayBuffer()}).catch(e=>{fontBytes=undefined;throw e})
  const font=await doc.embedFont(await fontBytes,{subset:false});const [width,height]=PageSizes.A4;const margin=32;const tableWidth=width-margin*2
@@ -32,5 +32,7 @@ export async function downloadLoanPdf(loan:Loan,equipment:Equipment[]){
  signatureRow(['구분','소속','직위','성명 / 서명'],26,true);(approvals.length?approvals:[{name:'',department:'',position:''}]).forEach(a=>signatureRow(['반출 승인자',a.department||'',a.position||'',`${a.name||''}          (인)`],32));signatureRow(['반출자',loan.department||'',loan.position||'',`${loan.name}          (인)`],36)
  }
  text('서울영동교회',margin,18,8);text(`${pageIndex+1} / ${pages.length}`,width-margin-40,18,8)
- });doc.setTitle(loan.id);doc.setAuthor('서울영동교회 미디어사역부');const bytes=await doc.save();const url=URL.createObjectURL(new Blob([new Uint8Array(bytes)],{type:'application/pdf'}));const a=document.createElement('a');a.href=url;a.download=`${loan.id}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)
+ });doc.setTitle(loan.id);doc.setAuthor('서울영동교회 미디어사역부');const bytes=await doc.save();return new Blob([new Uint8Array(bytes)],{type:'application/pdf'})
+}
+export async function downloadLoanPdf(loan:Loan,equipment:Equipment[]){const url=URL.createObjectURL(await createLoanPdf(loan,equipment));const a=document.createElement('a');a.href=url;a.download=`${loan.id}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)
 }

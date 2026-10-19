@@ -33,3 +33,13 @@ GitHub Pages 배포 성공은 DB 마이그레이션이나 서버 함수 배포�
 003/004까지 적용했다면 SQL Editor에서 [005_catalog_delete.sql](migrations/005_catalog_delete.sql) 전체만 실행하면 됩니다. UPGRADE.sql에도 포함되어 있습니다. Edge Function 재배포는 필요하지 않습니다.
 
 그룹 삭제 시 소속 장비는 기타로 이동합니다. 대여 이력이 없는 장비는 삭제하고, 이력이 있는 장비는 비활성화합니다. 삭제 요청은 관리자 권한을 서버에서 확인하고 이력에 기록합니다.
+
+## 신청 검토·반려·PDF 미리보기 업데이트
+
+005까지 적용한 프로젝트는 SQL Editor에서 `migrations/006_application_review.sql` 전체를 실행하세요. 이어서 Edge Function `equipment-api` 코드를 `functions/equipment-api/index.ts` 전체로 교체해 배포하세요. 기존 Verify JWT 설정을 유지합니다.
+
+- 신청 전화번호는 010으로 시작하는 숫자 11자리만 허용합니다.
+- 승인은 반출 기록까지 함께 처리합니다. 기존 승인됐지만 반출 표시가 없던 신청도 승인 시각으로 반출 기록을 맞춥니다. 기존 미승인 반출 기록의 늦은 승인도 가능합니다.
+- 반려는 사유가 필수이며 예약 수량을 해제합니다. 신청자가 수정하면 반려 상태를 해제하고 재승인을 받습니다.
+- 반납 사진 업로드/조회 API를 제거합니다. 기존 비공개 사진과 과거 특이사항은 삭제하지 않습니다.
+- Pages 배포와 별개로 위 SQL/Edge Function 적용이 필요합니다.

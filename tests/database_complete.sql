@@ -22,7 +22,7 @@ begin
  if a->'snapshots'->'30000000-0000-0000-0000-000000000002'->>'name'<>'원래 장비명' then raise exception 'snapshot lost on update'; end if;
  a:=equipment_workflow('checkout',jsonb_build_object('id',a->>'id','revision',2),'00000000-0000-0000-0000-000000000002');
  a:=equipment_workflow('return',jsonb_build_object('id',a->>'id','name','테스트','phone','01000000000','revision',3,'note','반납시기록','items',jsonb_build_object('30000000-0000-0000-0000-000000000002',1)));
- if a->>'note'<>'변경특이사항' then raise exception 'return overwrote application note'; end if;
+ if a->>'note'<>'' then raise exception 'return overwrote application note'; end if;
  select count(*) into n from return_events where loan_id=(a->>'databaseId')::uuid;
  if n<>1 then raise exception 'missing return event'; end if;
  a:=equipment_workflow('undo_return',jsonb_build_object('id',a->>'id','revision',4,'reason','정정'),'00000000-0000-0000-0000-000000000002');

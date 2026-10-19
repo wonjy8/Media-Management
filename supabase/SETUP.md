@@ -79,3 +79,4 @@ select public.anonymize_expired_loans();
 장비 목록 API 연결은 확인했습니다. 이후 관리자 로그인·새 스키마/서버 기능의 원격 검증은 별도로 필요합니다.
 
 그룹·장비 삭제 기능은 `migrations/005_catalog_delete.sql`도 SQL Editor에서 실행하세요. 기존 프로젝트는 `UPGRADE.sql` 전체에 포함되어 있습니다.
+신청 반려와 통합 승인 기능은 `migrations/006_application_review.sql`까지 실행하고 최신 `equipment-api`를 배포하세요.

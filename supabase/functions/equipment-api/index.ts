@@ -12,10 +12,10 @@ Deno.serve(async req => {
   if (req.method !== 'POST') return respond({ error: '허용되지 않는 요청입니다.' }, 405)
   try {
     const text = await req.text()
-    if (text.length > 1_500_000) return respond({ error: '입력 내용이 너무 깁니다.' }, 413)
+    if (text.length > 20000) return respond({ error: '입력 내용이 너무 깁니다.' }, 413)
     const { action, args = {} } = JSON.parse(text)
-    const publicActions = ['catalog', 'create', 'lookup', 'update', 'cancel', 'return', 'upload_return_image']
-    const adminActions = ['admin_list', 'approve', 'checkout', 'undo_return', 'stock', 'return_images']
+    const publicActions = ['catalog', 'create', 'lookup', 'update', 'cancel', 'return']
+    const adminActions = ['admin_list', 'approve', 'reject', 'undo_return', 'stock']
     if (![...publicActions, ...adminActions].includes(action)) return respond({ error: '잘못된 요청입니다.' }, 400)
     if (['create','update','return'].includes(action)) {
       const items = args.items
@@ -30,6 +30,10 @@ Deno.serve(async req => {
       }
       if (String(args.note || '').length > 2000) return respond({ error: '특이사항은 2,000자 이하로 입력해 주세요.' }, 400)
     }
+    if (['create','update'].includes(action) && (typeof args.phone!=='string'||!/^010[0-9]{8}$/.test(args.phone))) return respond({error:'전화번호는 010으로 시작하는 숫자 11자리로 입력해 주세요. (- 없이)'},400)
+    if(action==='reject' && (typeof args.reason!=='string'||!args.reason.trim()||args.reason.length>500)) return respond({error:'반려 사유를 1~500자로 입력해 주세요.'},400)
+    if(['create','update'].includes(action))args.note=''
+    if(action==='return')args.photoPaths=[]
     let actor: string | null = null
     if (adminActions.includes(action)) {
       const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
@@ -45,38 +49,17 @@ Deno.serve(async req => {
     const phone = String(args.phone || '').replace(/\D/g, '')
     const identityName = String(args.identityName || args.name || '').trim()
     const identityPhone = String(args.identityPhone || args.phone || '').replace(/\D/g,'')
-    if (['create', 'lookup', 'update', 'cancel', 'return', 'upload_return_image'].includes(action)) {
+    if (['create', 'lookup', 'update', 'cancel', 'return'].includes(action)) {
       if (!identityName || identityName.length > 80 || !/^[0-9]{9,15}$/.test(identityPhone) || !String(args.name || '').trim() || String(args.name).length>80 || !/^[0-9]{9,15}$/.test(phone)) return respond({ error: '이름과 전화번호를 확인해 주세요.' }, 400)
       const { data: allowed, error } = await db.rpc('consume_request_limit', { p_ip: ip, p_target: `${identityName}:${identityPhone}`, p_action: action })
       if (error) throw error
       if (!allowed) return respond({ error: '조회 또는 요청이 너무 많습니다. 15분 후 다시 시도해 주세요.' }, 429)
     }
-    if (action === 'upload_return_image') {
-      const {data:loan,error} = await db.from('loans').select('id').eq('number',args.id).eq('borrower_name',String(args.name).trim()).eq('borrower_phone',phone).is('cancelled_at',null).is('anonymized_at',null).not('checked_out_at','is',null).maybeSingle()
-      if(error||!loan)return respond({error:'일치하는 대여 내역이 없습니다.'},400)
-      if(typeof args.image!=='string' || args.image.length>1_340_000)return respond({error:'사진은 1MB 이하여야 합니다.'},400)
-      const bytes=Uint8Array.from(atob(args.image),c=>c.charCodeAt(0))
-      if(bytes.length>1_000_000||bytes[0]!==0xff||bytes[1]!==0xd8||bytes[2]!==0xff)return respond({error:'올바른 JPG 사진을 선택해 주세요.'},400)
-      const path=`${loan.id}/${crypto.randomUUID()}.jpg`
-      const upload=await db.storage.from('return-images').upload(path,bytes,{contentType:'image/jpeg',upsert:false})
-      if(upload.error)return respond({error:'사진 저장에 실패했습니다. 저장소 설정을 확인해 주세요.'},400)
-      return respond({path})
-    }
-    if(action==='return_images'){
-      const{data:loan}=await db.from('loans').select('id').eq('number',args.id).maybeSingle()
-      if(!loan)return respond({error:'신청을 찾지 못했습니다.'},400)
-      const{data:events,error}=await db.from('return_events').select('photo_paths').eq('loan_id',loan.id).is('reversed_at',null)
-      if(error)throw error
-      const paths=events.flatMap(e=>e.photo_paths||[])
-      if(!paths.length)return respond([])
-      const{data,error:signError}=await db.storage.from('return-images').createSignedUrls(paths,300)
-      if(signError)throw signError
-      return respond(data.map(d=>d.signedUrl))
-    }
     const { data, error } = await db.rpc('equipment_workflow', { p_action: action, p_args: { ...args, phone, identityName, identityPhone }, p_actor: actor })
     if (error) {
       const messages: Record<string,string> = {
         INSUFFICIENT_STOCK: '다른 신청으로 대여 가능 수량이 변경되었습니다. 장비와 날짜를 다시 확인해 주세요.',
+        INVALID_PHONE:'전화번호는 010으로 시작하는 숫자 11자리로 입력해 주세요.',
         INVALID_REQUEST: '입력 내용을 확인해 주세요.', NOT_FOUND: '일치하는 신청이 없습니다.',
         ALREADY_CHECKED_OUT: '이미 반출된 신청은 수정하거나 취소할 수 없습니다.',
         INVALID_RETURN: '반납할 장비와 수량을 다시 확인해 주세요.',

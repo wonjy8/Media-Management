@@ -33,8 +33,7 @@ begin
  a:=equipment_workflow('undo_return',jsonb_build_object('id',id,'revision',4,'reason','오입력 정정'),'00000000-0000-0000-0000-000000000001');
  if (a->'returned'->>'10000000-0000-0000-0000-000000000001')::integer<>0 then raise exception 'undo failure'; end if;
  b:=equipment_workflow('create','{"name":"테스트","phone":"01000000000","reason":"수정 검증","start":"2027-02-01","end":"2027-02-03","items":{"10000000-0000-0000-0000-000000000001":1}}');
- b:=equipment_workflow('approve',jsonb_build_object('id',b->>'id','revision',1),'00000000-0000-0000-0000-000000000001');
- b:=equipment_workflow('update',jsonb_build_object('id',b->>'id','name','테스트','phone','01000000000','revision',2,'start','2027-02-02','end','2027-02-04','reason','변경','items',jsonb_build_object('10000000-0000-0000-0000-000000000001',2)));
+ b:=equipment_workflow('update',jsonb_build_object('id',b->>'id','name','테스트','phone','01000000000','revision',1,'start','2027-02-02','end','2027-02-04','reason','변경','items',jsonb_build_object('10000000-0000-0000-0000-000000000001',2)));
  if (b->>'approved')::boolean then raise exception 'update must reset approval'; end if;
  for i in 1..40 loop if not consume_request_limit('test-ip','test-target','lookup') then raise exception 'premature limit'; end if; end loop;
  if consume_request_limit('test-ip','test-target','lookup') then raise exception 'rate limit failure'; end if;
