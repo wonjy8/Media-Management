@@ -38,7 +38,7 @@ export async function createLoanPdf(loan:Loan,equipment:Equipment[]){
  const approvers=loan.approvers?.length?loan.approvers.slice(0,1):[{name:'',department:'',position:''}]
  const signatureData=[...approvers.map((a,i)=>[t.approverLabels[i]||t.approverLabels[0],...(t.showSignatureDepartment?[a.department||'']:[]),...(t.showSignaturePosition?[a.position||'']:[]),a.name||'']),[t.borrowerLabel,...(t.showSignatureDepartment?[loan.department||'']:[]),...(t.showSignaturePosition?[loan.position||'']:[]),loan.name]]
  const sigRows=signatureData.map(values=>{const cells=values.map((v,i)=>wrap(v,sigCols[i]-(i===values.length-1?48:20),fs));return {cells,height:Math.max(39,...cells.map(c=>c.length*lh+16))}})
- const sigTableTop=H-76-26-sigRows.reduce((n,r)=>n+r.height,0),sigHeadingTop=sigTableTop-23
+ const sigTableTop=H-52-26-sigRows.reduce((n,r)=>n+r.height,0),sigHeadingTop=sigTableTop-23
  if(sigHeadingTop<continuationTop)throw Error('서명란 내용이 한 페이지에 들어가지 않습니다. 서명란 이름이나 글자 크기를 줄여 주세요.')
  const noticeLines=t.notices.filter(n=>n.trim()).map(n=>wrap(n,CW-12,fs-1))
  const noticeH=noticeLines.length?22+noticeLines.reduce((n,l)=>n+l.length*(fs+3)+5,0):0
@@ -98,7 +98,7 @@ export async function createLoanPdf(loan:Loan,equipment:Equipment[]){
    const headers=['구분',...(t.showSignatureDepartment?['소속']:[]),...(t.showSignaturePosition?['직위']:[]),'성명'];let x=L
    headers.forEach((v,i)=>{text(p,v,x+10,sigTableTop+8,8,gray);x+=sigCols[i]})
    let sy=sigTableTop+26
-   sigRows.forEach(r=>{let x=L;r.cells.forEach((lines,i)=>{lines.forEach((v,j)=>text(p,v,x+10,sy+13+j*lh,fs));x+=sigCols[i]});right(p,'(서명)',R-10,sy+13,8,gray);sy+=r.height;hline(p,sy)})
+   sigRows.forEach((r,index)=>{let x=L;r.cells.forEach((lines,i)=>{lines.forEach((v,j)=>text(p,v,x+10,sy+13+j*lh,fs));x+=sigCols[i]});right(p,'(서명)',R-10,sy+13,8,gray);sy+=r.height;if(index<sigRows.length-1)hline(p,sy)})
   }
   hline(p,H-52);text(p,org,L,H-41,fit(org,CW*.43,7),gray);const mid=font.widthOfTextAtSize(loan.id,7);text(p,loan.id,(W-mid)/2,H-41,7,gray);right(p,`${index+1} / ${plans.length}`,R,H-41,8,gray)
  })
