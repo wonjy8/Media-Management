@@ -1,0 +1,3 @@
+[functions.equipment-api]
+# Public callers use a publishable key. Admin JWTs are verified inside the function.
+verify_jwt = false
