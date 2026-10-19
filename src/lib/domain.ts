@@ -1,6 +1,7 @@
 import type {PdfTemplate} from './pdfTemplate'
 export type Approver={id:string;name:string;department:string;position:string;active:boolean}
-export type Equipment={id:string;code?:string;name:string;model:string;group:string;qty:number;image:string;available?:number;description?:string;repair?:number;active?:boolean}
+export type Accessory={id:string;quantity:number;selectedByDefault:boolean}
+export type Equipment={accessories?:Accessory[];id:string;code?:string;name:string;model:string;group:string;qty:number;image:string;available?:number;description?:string;repair?:number;active?:boolean}
 export type Snapshot={name:string;code:string;model?:string;department?:string}
 export type Loan={pdfTemplate?:PdfTemplate|null;id:string;databaseId?:string;name:string;phone:string;department?:string;position?:string;reason:string;start:string;end:string;note:string;items:Record<string,number>;returned:Record<string,number>;approved:boolean;out:boolean;revision?:number;createdAt?:string;approvalDue?:string;approvedAt?:string;checkoutAt?:string;cancelled?:boolean;rejected?:boolean;rejectionReason?:string;rejectedAt?:string;snapshots?:Record<string,Snapshot>;approvers?:Approver[];returnNotes?:{notes:string;createdAt:string;reversed:boolean;items?:Record<string,number>;reversedAt?:string;reversalReason?:string}[]}
 export const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'})
