@@ -60,6 +60,7 @@ Deno.serve(async req => {
     if (error) {
       const messages: Record<string,string> = {
         INSUFFICIENT_STOCK: '다른 신청으로 대여 가능 수량이 변경되었습니다. 장비와 날짜를 다시 확인해 주세요.',
+        REJECTED_APPLICATION:'반려된 신청은 수정하거나 취소할 수 없습니다. 새로 신청해 주세요.',
         INVALID_PHONE:'전화번호는 010으로 시작하는 숫자 11자리로 입력해 주세요.',
         INVALID_REQUEST: '입력 내용을 확인해 주세요.', NOT_FOUND: '일치하는 신청이 없습니다.',
         ALREADY_CHECKED_OUT: '이미 반출된 신청은 수정하거나 취소할 수 없습니다.',
