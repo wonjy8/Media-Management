@@ -10,7 +10,7 @@ import EquipmentLinksEditor from './EquipmentLinksEditor'
 import {equipmentCodes,normalizeEquipmentCodes} from '../lib/equipmentCodes'
 
 type Group = {id:string;name:string}
-const sortGroups = (groups:Group[]) => [...groups].sort((a,b)=>a.name==='기타 장비'?1:b.name==='기타 장비'?-1:a.name.localeCompare(b.name,'ko'))
+const sortGroups = (groups:Group[]) => [...groups].sort((a,b)=>a.name==='기타 장비'?1:b.name==='기타 장비'?-1:a.name==='부속품'?1:b.name==='부속품'?-1:a.name.localeCompare(b.name,'ko'))
 type Row = {is_accessory?:boolean;parents?:Accessory[];accessories?:Accessory[];id:string;code:string;name:string;model:string;group_id:string|null;storage_location:string|null;serial_numbers:string|null;image_path:string|null;description:string;quantity:number;repair_quantity:number;active:boolean}
 export type DemoEquipment = {isAccessory?:boolean;accessories?:Accessory[];id:string;name:string;model:string;group:string;qty:number;image:string;available?:number;code?:string|null;description?:string;repair?:number;active?:boolean}
 const empty:Omit<Row,'id'>={code:'',name:'',model:'',group_id:null,storage_location:null,serial_numbers:null,image_path:null,description:'',quantity:1,repair_quantity:0,active:true,is_accessory:false,parents:[],accessories:[]}
