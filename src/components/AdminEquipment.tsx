@@ -66,7 +66,7 @@ export default function AdminEquipment({demoItems,onChange,onDemoChange,section}
     if(kind==='group'){const next=groups.filter(g=>g.id!==id);setGroups(next);localStorage.setItem('media-groups',JSON.stringify(next));persistDemo(rows.map(e=>e.group_id===id?{...e,group_id:null}:e),next)}
     else{const loans=JSON.parse(localStorage.getItem('media-loans')||'[]') as {items:Record<string,number>}[];archived=loans.some(l=>Object.hasOwn(l.items,id));const next=archived?rows.map(e=>e.id===id?{...e,active:false}:e):rows.filter(e=>e.id!==id).map(e=>({...e,accessories:e.accessories?.filter(a=>a.id!==id)}));persistDemo(next.map(e=>e.is_accessory&&!next.some(parent=>parent.accessories?.some(a=>a.id===e.id))?{...e,is_accessory:false,active:false}:e))}
    }else{
-    const {data,error}=await supabase!.rpc('admin_delete_catalog',{p_kind:kind,p_id:id})
+    const {error}=await supabase!.rpc('admin_delete_catalog',{p_kind:kind,p_id:id})
     if(error){if(error.code==='PGRST202')throw new Error('삭제 기능을 사용하려면 Supabase에서 005_catalog_delete.sql을 실행해 주세요.');throw error}
     archived=false;await load();await onChange()
    }
