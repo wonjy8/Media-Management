@@ -21,7 +21,7 @@ export default function AdminEquipment({demoItems,onChange,onDemoChange,section}
   if(demoMode){const gs=JSON.parse(localStorage.getItem('media-groups')||'null')||[...new Set(demoItems.map(x=>x.group))].map(name=>({id:name,name}));setGroups(gs);setRows(demoItems.map(e=>({is_accessory:e.isAccessory??demoItems.some(p=>p.accessories?.some(a=>a.id===e.id)),parents:demoItems.flatMap(p=>(p.accessories||[]).filter(a=>a.id===e.id).map(a=>({...a,id:p.id}))),accessories:e.accessories||[],id:e.id,code:e.code||'',name:e.name,model:e.model,group_id:gs.find((g:Group)=>g.name===e.group)?.id||null,image_path:e.image,description:e.description||'',quantity:e.qty,repair_quantity:e.repair||0,active:e.active!==false})));return}
   if(!supabase)throw new Error('서버 연결이 필요합니다.')
   const [eq,gs,links,kinds]=await Promise.all([supabase.from('equipment').select('*').order('code'),supabase.from('groups').select('*').order('name'),loadAccessories().catch(error=>{if(missingAccessorySchema(error))return null;throw error}),loadEquipmentKinds()]);setRolesReady(kinds!==null);setAccessoryReady(links!==null)
-  if(eq.error)throw eq.error;if(gs.error)throw gs.error;setRows(eq.data.map(e=>({...e,code:e.code||'',model:e.model||'',description:e.description||'',is_accessory:e.is_accessory??(links||[]).some(a=>a.accessory_id===e.id),parents:parentsFor(links||[],e.id),accessories:linksFor(links||[],e.id)})));setGroups(gs.data)
+  if(eq.error)throw eq.error;if(gs.error)throw gs.error;setRows(eq.data.filter(e=>!e.deleted_at).map(e=>({...e,code:e.code||'',model:e.model||'',description:e.description||'',is_accessory:e.is_accessory??(links||[]).some(a=>a.accessory_id===e.id),parents:parentsFor(links||[],e.id),accessories:linksFor(links||[],e.id)})));setGroups(gs.data)
  }catch(e){setError(message(e))}finally{setLoading(false)}},[demoItems])
  useEffect(()=>{queueMicrotask(()=>void load())},[load])
  const preview=useMemo(()=>photo?URL.createObjectURL(photo):'',[photo]);useEffect(()=>()=>{if(preview)URL.revokeObjectURL(preview)},[preview])
@@ -58,7 +58,7 @@ export default function AdminEquipment({demoItems,onChange,onDemoChange,section}
  }catch(e){if(uploaded)await supabase?.storage.from('equipment-images').remove([uploaded]);setError(message(e))}finally{setBusy(false)}}
  async function saveGroup(event:React.FormEvent){event.preventDefault();if(busy||!groupName.trim())return;setBusy(true);setError('');try{const name=groupName.trim();if(demoMode){if(groups.some(g=>g.name===name&&g.id!==groupEdit))throw new Error('이미 있는 그룹입니다.');const next=groupEdit?groups.map(g=>g.id===groupEdit?{...g,name}:g):[...groups,{id:crypto.randomUUID(),name}];setGroups(next);localStorage.setItem('media-groups',JSON.stringify(next));persistDemo(rows,next)}else{const q=groupEdit?supabase!.from('groups').update({name}).eq('id',groupEdit):supabase!.from('groups').insert({name});const {data,error}=await q.select('id');if(error?.code==='23505')throw new Error('이미 있는 그룹명입니다.');if(error||!data?.length)throw new Error('그룹을 저장하지 못했습니다. 관리 권한을 확인해 주세요.');await load();await onChange()}setGroupName('');setGroupEdit(null);setStatus('그룹이 저장되었습니다.')}catch(e){setError(message(e))}finally{setBusy(false)}}
  async function remove(kind:'group'|'equipment',id:string,name:string){
-  if(busy||!window.confirm(kind==='group'?`${name} 그룹을 삭제할까요? 소속 장비는 기타로 이동합니다.`:`${name} 장비를 삭제할까요? 대여 이력이 있으면 기록을 보존하고 비활성화합니다.`))return
+  if(busy||!window.confirm(kind==='group'?`${name} 그룹을 삭제할까요? 소속 장비는 기타로 이동합니다.`:`${name} 장비를 목록에서 삭제할까요? 기존 대여 기록은 보존됩니다.`))return
   setBusy(true);setError('');setStatus('')
   try{
    let archived=false
@@ -68,7 +68,7 @@ export default function AdminEquipment({demoItems,onChange,onDemoChange,section}
    }else{
     const {data,error}=await supabase!.rpc('admin_delete_catalog',{p_kind:kind,p_id:id})
     if(error){if(error.code==='PGRST202')throw new Error('삭제 기능을 사용하려면 Supabase에서 005_catalog_delete.sql을 실행해 주세요.');throw error}
-    archived=data==='archived';await load();await onChange()
+    archived=false;await load();await onChange()
    }
    if(kind==='group'&&groupEdit===id){setGroupEdit(null);setGroupName('')}
    setStatus(archived?'대여 이력이 있어 비활성화했습니다.':'삭제되었습니다.')
